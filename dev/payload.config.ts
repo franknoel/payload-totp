@@ -45,6 +45,7 @@ export default buildConfig({
 		payloadTotp({
 			collection: 'users',
 			forceSetup: process.env.FORCE_SETUP === '1',
+			disabled: process.env.DISABLED === '1',
 			disableAccessWrapper: process.env.DISABLE_ACCESS_WRAPPER === '1',
 			forceWhiteBackgroundOnQrCode:
 				process.env.FORCE_WHITE_BACKGROUND_ON_QR_CODE === '1',

@@ -1,5 +1,6 @@
 export interface ISetupArgs {
 	forceSetup?: boolean
+	disabled?: boolean
 	disableAccessWrapper?: boolean
 	forceWhiteBackgroundOnQrCode?: boolean
 	autoRefresh?: boolean

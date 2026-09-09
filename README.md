@@ -85,6 +85,22 @@ The `collection` property specifies which collection with `auth` enabled should 
 
 Allows you to conditionally disable the plugin based on runtime conditions.
 
+```ts
+payloadTotp({
+	collection: 'users',
+	disabled: process.env.NODE_ENV === 'development',
+})
+```
+
+When disabled, none of the plugin's behaviour is registered: your own access
+functions are left alone, the TOTP strategy, the admin provider, the setup and
+verify views and the endpoints are not added, and the account page shows no
+authenticator field.
+
+The `totpSecret` field stays on the collection, so toggling the option doesn't
+change the database schema and users who had already enrolled keep their secret
+for whenever the plugin is enabled again.
+
 ### `forceSetup`
 
 By default, the plugin does not force users to configure TOTP. The TOTP verification will only be prompted if the user has configured it. This option forces all users to configure their TOTP after login, enhancing security by ensuring 2FA is enabled for all accounts.

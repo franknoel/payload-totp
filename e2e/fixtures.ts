@@ -44,6 +44,7 @@ export const test = base.extend<
 			await use(
 				async ({
 					forceSetup,
+					disabled,
 					disableAccessWrapper,
 					forceWhiteBackgroundOnQrCode,
 					autoRefresh,
@@ -78,6 +79,7 @@ export const test = base.extend<
 							PAYLOAD_SECRET,
 							PORT: port.toString(),
 							FORCE_SETUP: forceSetup ? '1' : undefined,
+							DISABLED: disabled ? '1' : undefined,
 							DISABLE_ACCESS_WRAPPER: disableAccessWrapper ? '1' : undefined,
 							DATABASE_URI: `${mongod.getUri()}&retryWrites=true`,
 							ADMIN_ROUTE: adminRoute,

@@ -15,6 +15,54 @@ import { totpAccess } from './totpAccess.js'
 const payloadTotp =
 	(pluginOptions: PayloadTOTPConfig) =>
 	(config: Config): Config => {
+		// Holds the secret of an enrolled user. It stays on the collection even when
+		// the plugin is disabled, so that toggling the option doesn't drop the column
+		// and force everyone who had set TOTP up to enroll again.
+		const totpSecretField = {
+			name: 'totpSecret',
+			type: 'text',
+			access: {
+				create: () => false,
+				read: () => false,
+				update: () => false,
+			},
+			admin: {
+				disableBulkEdit: true,
+				disableListColumn: true,
+				disableListFilter: true,
+				hidden: true,
+			},
+			disableBulkEdit: true,
+			disableListColumn: true,
+			disableListFilter: true,
+		} as TextField
+
+		// A `totpAccess` applied by hand, as documented in the README, reads the
+		// options back from here, so they stay on the config even while disabled.
+		const custom = {
+			...(config.custom || {}),
+			totp: {
+				pluginOptions,
+			},
+		}
+
+		// Disabled keeps the schema but adds none of the behaviour: no access
+		// wrappers, auth strategy, admin provider, views, endpoints or hooks.
+		if (pluginOptions.disabled) {
+			return {
+				...config,
+				collections: (config.collections || []).map((collection) =>
+					collection.slug === pluginOptions.collection
+						? {
+								...collection,
+								fields: [...(collection.fields || []), totpSecretField],
+							}
+						: collection,
+				),
+				custom,
+			}
+		}
+
 		return {
 			...config,
 			admin: {
@@ -137,24 +185,7 @@ const payloadTotp =
 							},
 							fields: [
 								...(collection.fields || []),
-								{
-									name: 'totpSecret',
-									type: 'text',
-									access: {
-										create: () => false,
-										read: () => false,
-										update: () => false,
-									},
-									admin: {
-										disableBulkEdit: true,
-										disableListColumn: true,
-										disableListFilter: true,
-										hidden: true,
-									},
-									disableBulkEdit: true,
-									disableListColumn: true,
-									disableListFilter: true,
-								} as TextField,
+								totpSecretField,
 								{
 									name: 'totpSecretUI',
 									type: 'ui',
@@ -241,12 +272,7 @@ const payloadTotp =
 					}
 				}),
 			],
-			custom: {
-				...(config.custom || {}),
-				totp: {
-					pluginOptions,
-				},
-			},
+			custom,
 			endpoints: [
 				...(config.endpoints || []),
 				{
