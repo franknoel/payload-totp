@@ -21,6 +21,7 @@ This plugin enhances security by wrapping the existing access controls under a T
 - Built-in support for both dark and light themes.
 - Compatible with API key authentication.
 - Works with any authentication strategy supported by PayloadCMS.
+- Counts wrong codes toward Payload's login lockout, so codes cannot be brute-forced.
 
 ## Installation
 Install the plugin using any JavaScript package manager like [pnpm](https://pnpm.io/), [npm](https://npmjs.com/), or [Yarn](https://yarnpkg.com/):
@@ -182,6 +183,12 @@ export const posts: CollectionConfig = {
 	},
 }
 ```
+
+## Brute-force Protection
+
+A code has a million possible values with the default six digits, and the verification accepts the codes for the previous and next 30-second step as well, so an unlimited number of tries would eventually land on one. Every code submitted to `/verify-totp` and `/remove-totp` therefore counts toward the collection's login lockout, exactly like a wrong password would: after [`maxLoginAttempts`](https://payloadcms.com/docs/authentication/overview#config-options) wrong codes the account is locked for `lockTime`, the forms show Payload's usual "too many failed login attempts" message, and an admin can unlock the user from the list view. A correct code clears the count.
+
+Nothing needs to be configured. The count is Payload's own `loginAttempts` field on the auth collection, and setting `maxLoginAttempts: 0` on the collection turns the lockout off for codes as it does for passwords.
 
 ## Dashboard Walkthrough
 
